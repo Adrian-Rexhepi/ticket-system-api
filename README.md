@@ -12,8 +12,8 @@ Filter und Suche: Tickets nach Status, Priorität oder anderen Kriterien filtern
 
 Technologien:
 
-Java 17+
-Spring Boot (oder ein anderes Framework deiner Wahl)
+Java 21
+Spring Boot
 REST-Architektur
-JSON für Datenformat
-H2 oder eine andere Datenbank (z.B. MySQL) für die Persistenz
+JSON
+MySQL
