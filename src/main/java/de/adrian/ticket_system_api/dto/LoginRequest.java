@@ -1,20 +1,18 @@
 package de.adrian.ticket_system_api.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
-public class ProjectResponse {
+@NoArgsConstructor
+public class LoginRequest {
 
     @NotBlank
-    private Long id;
+    private String username;
 
     @NotBlank
-    private String name;
-
-    private String description;
+    private String password;
 }

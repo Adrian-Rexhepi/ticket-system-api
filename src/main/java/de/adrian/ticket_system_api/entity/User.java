@@ -1,9 +1,6 @@
 package de.adrian.ticket_system_api.entity;
 
-import de.adrian.ticket_system_api.enums.TicketStatus;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,20 +11,18 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "tickets")
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Ticket {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     private Long id;
-    private String title;
-    private String description;
-    @Enumerated(EnumType.STRING)
-    private TicketStatus status;
-
+    private String username;
+    private String password;
+    private String email;
 }
