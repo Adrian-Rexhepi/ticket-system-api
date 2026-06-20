@@ -4,6 +4,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import de.adrian.ticket_system_api.dto.LoginRequest;
 import de.adrian.ticket_system_api.dto.RegisterRequest;
 import de.adrian.ticket_system_api.service.AuthService;
 import jakarta.validation.Valid;
@@ -19,15 +21,12 @@ public class AuthController {
     @PostMapping("/register")
     public String register(@RequestBody @Valid RegisterRequest registerRequest) {
 
-        return authService.register(registerRequest.getUsername(), 
-        registerRequest.getPassword(), 
-        registerRequest.getEmail());
+        return authService.register(registerRequest).getToken();
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody @Valid RegisterRequest loginRequest) {
-        
-        return authService.login(loginRequest.getUsername(), 
-        loginRequest.getPassword());
+    public String login(@RequestBody @Valid LoginRequest loginRequest) {
+
+        return authService.login(loginRequest).getToken();
     }
 }
