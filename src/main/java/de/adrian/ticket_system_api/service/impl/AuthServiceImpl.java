@@ -1,5 +1,9 @@
 package de.adrian.ticket_system_api.service.impl;
 
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 import org.springframework.stereotype.Service;
 
 import de.adrian.ticket_system_api.dto.AuthResponse;
@@ -17,7 +21,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
 
     @Override
-    public AuthResponse register(RegisterRequest registerRequest) {
+    public AuthResponse register(RegisterRequest registerRequest) throws NoSuchAlgorithmException {
         if (userRepository.findAll().stream()
                 .filter(user -> user.getUsername().equals(registerRequest.getUsername()))
                 .findFirst()
@@ -33,7 +37,7 @@ public class AuthServiceImpl implements AuthService {
 
         User user = new User();
         user.setUsername(registerRequest.getUsername());
-        user.setPassword(registerRequest.getPassword()); // Todo hash password
+        user.setPassword(hashPassword(registerRequest.getPassword()));
         user.setEmail(registerRequest.getEmail());
         userRepository.save(user);
 
@@ -44,15 +48,26 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthResponse login(LoginRequest loginRequest) {
+    public AuthResponse login(LoginRequest loginRequest) throws NoSuchAlgorithmException {
+        String hashedPassword = hashPassword(loginRequest.getPassword());
         User user = userRepository.findAll().stream()
-                .filter(u -> u.getUsername().equals(loginRequest.getUsername()) && u.getPassword().equals(loginRequest.getPassword()))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Invalid username or password"));
-
+            .filter(u -> u.getUsername().equals(loginRequest.getUsername()) && u.getPassword().equals(hashedPassword))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("Invalid username or password"));
         // Generate JWT token (placeholder token, implement JWT generation logic)
         String token = "dummy-jwt-token-for-" + user.getUsername();
 
         return new AuthResponse(token, user.getUsername(), "USER");
+    }
+
+    public String hashPassword(String password) throws NoSuchAlgorithmException {
+
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+
+        byte[] hash = md.digest(password.getBytes());
+
+        BigInteger bitInt = new BigInteger(1, hash);
+
+        return bitInt.toString(16);
     }
 }
