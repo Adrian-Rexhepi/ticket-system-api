@@ -73,8 +73,8 @@ public class AuthServiceImpl implements AuthService {
                 .withSubject(user.getUsername())
                 .withClaim("role", "USER")
                 .withIssuedAt(new Date())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 86400000)) // Token valid for 1 day
-                .sign(Algorithm.HMAC256("secret")); // Use a secure secret key in production
+                .withExpiresAt(new Date(System.currentTimeMillis() + 3600000))
+                .sign(Algorithm.HMAC256("secret"));
 
         return token;
     }
