@@ -6,7 +6,7 @@ import de.adrian.ticket_system_api.dto.RegisterRequest;
 
 public interface AuthService {
 
-    AuthResponse register(RegisterRequest request);
+    AuthResponse register(RegisterRequest request) throws Exception;
 
-    AuthResponse login(LoginRequest request);
+    AuthResponse login(LoginRequest request) throws Exception;
 }
