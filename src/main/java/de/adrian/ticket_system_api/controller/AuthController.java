@@ -19,13 +19,13 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public String register(@RequestBody @Valid RegisterRequest registerRequest) {
+    public String register(@RequestBody @Valid RegisterRequest registerRequest) throws Exception {
 
         return authService.register(registerRequest).getToken();
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody @Valid LoginRequest loginRequest) {
+    public String login(@RequestBody @Valid LoginRequest loginRequest) throws Exception {
 
         return authService.login(loginRequest).getToken();
     }
