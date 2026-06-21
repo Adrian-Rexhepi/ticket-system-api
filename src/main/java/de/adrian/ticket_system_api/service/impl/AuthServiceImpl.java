@@ -3,9 +3,7 @@ package de.adrian.ticket_system_api.service.impl;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
 import org.springframework.stereotype.Service;
-
 import de.adrian.ticket_system_api.dto.AuthResponse;
 import de.adrian.ticket_system_api.dto.LoginRequest;
 import de.adrian.ticket_system_api.dto.RegisterRequest;
@@ -13,6 +11,9 @@ import de.adrian.ticket_system_api.entity.User;
 import de.adrian.ticket_system_api.repository.UserRepository;
 import de.adrian.ticket_system_api.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -41,10 +42,7 @@ public class AuthServiceImpl implements AuthService {
         user.setEmail(registerRequest.getEmail());
         userRepository.save(user);
 
-        // Generate JWT token (placeholder token, implement JWT generation logic)
-        String token = "dummy-jwt-token-for-" + user.getUsername();
-
-        return new AuthResponse(token, user.getUsername(), "USER");
+        return new AuthResponse(generateToken(user), user.getUsername(), "USER");
     }
 
     @Override
@@ -54,13 +52,11 @@ public class AuthServiceImpl implements AuthService {
             .filter(u -> u.getUsername().equals(loginRequest.getUsername()) && u.getPassword().equals(hashedPassword))
             .findFirst()
             .orElseThrow(() -> new RuntimeException("Invalid username or password"));
-        // Generate JWT token (placeholder token, implement JWT generation logic)
-        String token = "dummy-jwt-token-for-" + user.getUsername();
 
-        return new AuthResponse(token, user.getUsername(), "USER");
+        return new AuthResponse(generateToken(user), user.getUsername(), "USER");
     }
 
-    public String hashPassword(String password) throws NoSuchAlgorithmException {
+    private String hashPassword(String password) throws NoSuchAlgorithmException {
 
         MessageDigest md = MessageDigest.getInstance("SHA-256");
 
@@ -69,5 +65,17 @@ public class AuthServiceImpl implements AuthService {
         BigInteger bitInt = new BigInteger(1, hash);
 
         return bitInt.toString(16);
+    }
+
+    private String generateToken(User user) {
+        
+         String token = JWT.create()
+                .withSubject(user.getUsername())
+                .withClaim("role", "USER")
+                .withIssuedAt(new Date())
+                .withExpiresAt(new Date(System.currentTimeMillis() + 86400000)) // Token valid for 1 day
+                .sign(Algorithm.HMAC256("secret")); // Use a secure secret key in production
+
+        return token;
     }
 }
