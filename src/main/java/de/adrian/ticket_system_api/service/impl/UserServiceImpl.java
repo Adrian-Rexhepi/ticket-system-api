@@ -1,9 +1,8 @@
 package de.adrian.ticket_system_api.service.impl;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import de.adrian.ticket_system_api.entity.User;
 import de.adrian.ticket_system_api.repository.UserRepository;
 import de.adrian.ticket_system_api.service.UserService;
@@ -21,8 +20,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public Page<User> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
     @Override

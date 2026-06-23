@@ -1,13 +1,15 @@
 package de.adrian.ticket_system_api.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import de.adrian.ticket_system_api.entity.Ticket;
 
 public interface TicketService {
 
     Ticket createTicket(Ticket ticket);
 
-    List<Ticket> getAllTickets();
+    Page<Ticket> getAllTickets(Pageable pageable);
 
     Ticket updateTicket(Long id, Ticket ticket);
     

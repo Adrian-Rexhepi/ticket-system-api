@@ -1,6 +1,7 @@
 package de.adrian.ticket_system_api.service.impl;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import de.adrian.ticket_system_api.entity.Project;
 import de.adrian.ticket_system_api.repository.ProjectRepository;
@@ -19,8 +20,8 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<Project> getAllProjects() {
-        return projectRepository.findAll();
+    public Page<Project> getAllProjects(Pageable pageable) {
+        return projectRepository.findAll(pageable);
     }
 
     @Override
