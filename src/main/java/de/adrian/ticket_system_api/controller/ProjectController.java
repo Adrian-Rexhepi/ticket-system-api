@@ -1,7 +1,5 @@
 package de.adrian.ticket_system_api.controller;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,7 +7,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import de.adrian.ticket_system_api.dto.ProjectResponse;
 import de.adrian.ticket_system_api.entity.Project;
 import de.adrian.ticket_system_api.service.ProjectService;

@@ -9,17 +9,16 @@ import de.adrian.ticket_system_api.dto.LoginRequest;
 import de.adrian.ticket_system_api.dto.RegisterRequest;
 import de.adrian.ticket_system_api.entity.User;
 import de.adrian.ticket_system_api.repository.UserRepository;
+import de.adrian.ticket_system_api.security.JwtService;
 import de.adrian.ticket_system_api.service.AuthService;
 import lombok.RequiredArgsConstructor;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
+    private final JwtService jwtService;
 
     @Override
     public AuthResponse register(RegisterRequest registerRequest) throws NoSuchAlgorithmException {
@@ -42,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
         user.setEmail(registerRequest.getEmail());
         userRepository.save(user);
 
-        return new AuthResponse(generateToken(user), user.getUsername(), "USER");
+        return new AuthResponse(jwtService.generateToken(user), user.getUsername(), "USER");
     }
 
     @Override
@@ -53,7 +52,7 @@ public class AuthServiceImpl implements AuthService {
             .findFirst()
             .orElseThrow(() -> new RuntimeException("Invalid username or password"));
 
-        return new AuthResponse(generateToken(user), user.getUsername(), "USER");
+        return new AuthResponse(jwtService.generateToken(user), user.getUsername(), "USER");
     }
 
     private String hashPassword(String password) throws NoSuchAlgorithmException {
@@ -67,15 +66,4 @@ public class AuthServiceImpl implements AuthService {
         return bitInt.toString(16);
     }
 
-    private String generateToken(User user) {
-        
-         String token = JWT.create()
-                .withSubject(user.getUsername())
-                .withClaim("role", "USER")
-                .withIssuedAt(new Date())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 3600000))
-                .sign(Algorithm.HMAC256("secret"));
-
-        return token;
-    }
 }
