@@ -1,11 +1,13 @@
 package de.adrian.ticket_system_api.security;
 
 import java.util.Date;
+import org.springframework.stereotype.Service;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import de.adrian.ticket_system_api.entity.User;
 
+@Service
 public class JwtService {
 
     private static final String SECRET = System.getenv("JWT_SECRET");
