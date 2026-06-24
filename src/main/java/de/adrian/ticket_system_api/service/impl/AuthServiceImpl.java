@@ -1,13 +1,14 @@
 package de.adrian.ticket_system_api.service.impl;
 
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import de.adrian.ticket_system_api.dto.AuthResponse;
 import de.adrian.ticket_system_api.dto.LoginRequest;
 import de.adrian.ticket_system_api.dto.RegisterRequest;
 import de.adrian.ticket_system_api.entity.User;
+import de.adrian.ticket_system_api.enums.UserRole;
+import de.adrian.ticket_system_api.exception.InvalidCredentialsException;
+import de.adrian.ticket_system_api.exception.UserAlreadyExistsException;
 import de.adrian.ticket_system_api.repository.UserRepository;
 import de.adrian.ticket_system_api.security.JwtService;
 import de.adrian.ticket_system_api.service.AuthService;
@@ -19,51 +20,38 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
-    public AuthResponse register(RegisterRequest registerRequest) throws NoSuchAlgorithmException {
-        if (userRepository.findAll().stream()
-                .filter(user -> user.getUsername().equals(registerRequest.getUsername()))
-                .findFirst()
-                .isPresent()) {
-            throw new RuntimeException("Username already exists");
+    public AuthResponse register(RegisterRequest registerRequest) {
+        if (userRepository.existsByUsername(registerRequest.getUsername())) {
+            throw new UserAlreadyExistsException("Username already exists");
         }
-        if (userRepository.findAll().stream()
-                .filter(user -> user.getEmail().equals(registerRequest.getEmail()))
-                .findFirst()
-                .isPresent()) {
-            throw new RuntimeException("Email already exists");
+        if (userRepository.existsByEmail(registerRequest.getEmail())) {
+            throw new UserAlreadyExistsException("Email already exists");
         }
 
         User user = new User();
         user.setUsername(registerRequest.getUsername());
-        user.setPassword(hashPassword(registerRequest.getPassword()));
+        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setEmail(registerRequest.getEmail());
+        user.setRole(UserRole.USER);
         userRepository.save(user);
 
-        return new AuthResponse(jwtService.generateToken(user), user.getUsername(), "USER");
+        return new AuthResponse(jwtService.generateToken(user), user.getUsername(), user.getRole().toString());
     }
 
     @Override
-    public AuthResponse login(LoginRequest loginRequest) throws NoSuchAlgorithmException {
-        String hashedPassword = hashPassword(loginRequest.getPassword());
-        User user = userRepository.findAll().stream()
-            .filter(u -> u.getUsername().equals(loginRequest.getUsername()) && u.getPassword().equals(hashedPassword))
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("Invalid username or password"));
+    public AuthResponse login(LoginRequest loginRequest) {
+        User user = userRepository.findByUsername(loginRequest.getUsername())
+            .orElseThrow(() ->
+                new InvalidCredentialsException("Invalid username or password"));
 
-        return new AuthResponse(jwtService.generateToken(user), user.getUsername(), "USER");
-    }
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+            throw new InvalidCredentialsException("Invalid username or password");
+        }
 
-    private String hashPassword(String password) throws NoSuchAlgorithmException {
-
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-
-        byte[] hash = md.digest(password.getBytes());
-
-        BigInteger bitInt = new BigInteger(1, hash);
-
-        return bitInt.toString(16);
+        return new AuthResponse(jwtService.generateToken(user), user.getUsername(), user.getRole().toString());
     }
 
 }
